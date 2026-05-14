@@ -17,6 +17,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QPixmap, QFont, QIcon
 from PyQt6.QtCore import Qt, QSize, QTimer
+from PIL import Image
+import io
 
 
 class TournamentApp(QMainWindow):
@@ -46,6 +48,33 @@ class TournamentApp(QMainWindow):
         self.stacked_widget.addWidget(self.results_screen)
 
         self.stacked_widget.setCurrentWidget(self.menu_screen)
+
+    @staticmethod
+    def fix_image_orientation(image_path):
+        """Исправить ориентацию изображения по EXIF метаданным"""
+        try:
+            img = Image.open(image_path)
+
+            # Get EXIF orientation
+            try:
+                exif = img._getexif()
+                if exif is not None:
+                    orientation = exif.get(274)  # 274 is EXIF Orientation tag
+
+                    # Apply rotation
+                    if orientation == 3:
+                        img = img.rotate(180, expand=True)
+                    elif orientation == 6:
+                        img = img.rotate(270, expand=True)
+                    elif orientation == 8:
+                        img = img.rotate(90, expand=True)
+            except (AttributeError, KeyError, IndexError):
+                pass
+
+            return img
+        except Exception as e:
+            print(f"Error fixing orientation for {image_path}: {e}")
+            return Image.open(image_path)
 
     def create_menu_screen(self):
         """Экран загрузки фото"""
@@ -228,9 +257,12 @@ class TournamentApp(QMainWindow):
 
     def show_match(self):
         """Показать матч"""
-        # Clear previous buttons
-        for button in self.photo_buttons:
-            button.setParent(None)
+        # Clear previous buttons and layout
+        while self.photos_container.count():
+            item = self.photos_container.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
         self.photo_buttons = []
 
         # Determine number of photos in this match
@@ -277,8 +309,17 @@ class TournamentApp(QMainWindow):
             btn.setMinimumSize(QSize(300, 400))
             btn.setMaximumSize(QSize(400, 500))
 
-            # Load and set image
-            pixmap = QPixmap(photo_path)
+            # Load and set image with proper orientation
+            pil_img = self.fix_image_orientation(photo_path)
+            pil_img_rgb = pil_img.convert("RGB")
+
+            # Convert PIL to QPixmap via bytes
+            buffer = io.BytesIO()
+            pil_img_rgb.save(buffer, format="PPM")
+            buffer.seek(0)
+            pixmap = QPixmap()
+            pixmap.loadFromData(buffer.getvalue(), "PPM")
+
             if not pixmap.isNull():
                 pixmap = pixmap.scaledToWidth(
                     300, Qt.TransformationMode.SmoothTransformation
@@ -338,7 +379,15 @@ class TournamentApp(QMainWindow):
     def show_winner(self):
         """Показать победителя"""
         winner_path = self.winners[0]
-        pixmap = QPixmap(winner_path)
+        pil_img = self.fix_image_orientation(winner_path)
+        pil_img_rgb = pil_img.convert("RGB")
+
+        # Convert PIL to QPixmap via bytes
+        buffer = io.BytesIO()
+        pil_img_rgb.save(buffer, format="PPM")
+        buffer.seek(0)
+        pixmap = QPixmap()
+        pixmap.loadFromData(buffer.getvalue(), "PPM")
 
         if not pixmap.isNull():
             pixmap = pixmap.scaledToWidth(
