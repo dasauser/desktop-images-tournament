@@ -65,13 +65,21 @@ class TournamentApp(QMainWindow):
         description_font.setPointSize(14)
         description.setFont(description_font)
 
-        load_btn = QPushButton("Загрузить фото")
+        load_btn = QPushButton("Загрузить фото из папки")
         load_btn.setMinimumHeight(50)
         load_btn.setMinimumWidth(300)
-        load_btn.clicked.connect(self.load_photos)
+        load_btn.clicked.connect(self.load_photos_from_folder)
         load_font = QFont()
         load_font.setPointSize(12)
         load_btn.setFont(load_font)
+
+        select_btn = QPushButton("Выбрать фото")
+        select_btn.setMinimumHeight(50)
+        select_btn.setMinimumWidth(300)
+        select_btn.clicked.connect(self.load_photos_from_selection)
+        select_font = QFont()
+        select_font.setPointSize(12)
+        select_btn.setFont(select_font)
 
         self.photos_count_label = QLabel("Загружено фото: 0")
         self.photos_count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -92,6 +100,7 @@ class TournamentApp(QMainWindow):
         layout.addWidget(description)
         layout.addSpacing(30)
         layout.addWidget(load_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(select_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.photos_count_label)
         layout.addSpacing(30)
         layout.addWidget(start_btn, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -176,8 +185,8 @@ class TournamentApp(QMainWindow):
         widget.setLayout(layout)
         return widget
 
-    def load_photos(self):
-        """Загрузка фото из папки"""
+    def load_photos_from_folder(self):
+        """Загрузка всех фото из папки"""
         folder = QFileDialog.getExistingDirectory(self, "Выбери папку с фото")
         if folder:
             self.photos = []
@@ -188,6 +197,18 @@ class TournamentApp(QMainWindow):
                     self.photos.append(str(file))
 
             self.photos.sort()
+            self.photos_count_label.setText(f"Загружено фото: {len(self.photos)}")
+
+    def load_photos_from_selection(self):
+        """Загрузка выбранных фото"""
+        files, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Выбери фото",
+            "",
+            "Изображения (*.jpg *.jpeg *.png *.gif *.bmp);;Все файлы (*)",
+        )
+        if files:
+            self.photos = files
             self.photos_count_label.setText(f"Загружено фото: {len(self.photos)}")
 
     def start_tournament(self):
@@ -231,8 +252,23 @@ class TournamentApp(QMainWindow):
 
         # Update labels
         self.round_label.setText(f"Раунд {self.round_number}")
-        total_matches = (len(self.current_round) + 1) // 2
-        current_match = (self.match_index // 2) + 1
+        # Count total matches: (n + 1) // 2 for even, but first match has 3 if odd
+        total_matches = (
+            (len(self.current_round) + 2) // 3
+            if len(self.current_round) % 2 == 1
+            else len(self.current_round) // 2
+        )
+        if len(self.current_round) % 2 == 1:
+            total_matches = (len(self.current_round) - 1) // 2
+        else:
+            total_matches = len(self.current_round) // 2
+        current_match = 1 if self.match_index == 0 else (self.match_index // 2) + 1
+        if self.match_index == 0 and len(self.current_round) % 2 == 1:
+            current_match = 1
+        elif self.match_index > 0 and len(self.current_round) % 2 == 1:
+            current_match = ((self.match_index - 3) // 2) + 2
+        else:
+            current_match = (self.match_index // 2) + 1
         self.match_info.setText(f"Матч {current_match} из {total_matches}")
 
         # Create photo buttons
@@ -265,19 +301,19 @@ class TournamentApp(QMainWindow):
         """Выбрать победителя матча"""
         self.winners.append(photo_path)
 
-        # Determine how many photos were in this match
+        # Get how many photos were shown in current match
         remaining = len(self.current_round) - self.match_index
         if self.match_index == 0 and len(self.current_round) % 2 == 1:
-            match_photos = 3
+            match_size = 3
         else:
-            match_photos = 2
+            match_size = 2
 
-        if remaining >= match_photos:
-            match_photos = match_photos
+        if remaining >= match_size:
+            match_size = match_size
         else:
-            match_photos = remaining
+            match_size = remaining
 
-        self.match_index += match_photos
+        self.match_index += match_size
 
         # Check if round is over
         if self.match_index >= len(self.current_round):
