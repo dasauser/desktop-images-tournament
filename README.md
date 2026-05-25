@@ -1,120 +1,115 @@
-# Фото Турнир
+# Photo Tournament
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![PyQt6](https://img.shields.io/badge/PyQt6-6.7-green.svg)](https://pypi.org/project/PyQt6/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+A desktop application that implements a single-elimination tournament system for image comparison and ranking.
 
-Полнофункциональное desktop приложение для проведения турнира на выбывание (плей-офф) с фотографиями. Похоже на [pikuco.ru](https://pikuco.ru).
+## Features
 
-## 🎯 Описание
+- **Single-elimination tournament** — standard bracket system with automatic progression
+- **Odd participant support** — first match of odd-numbered rounds contains 3 participants instead of 2
+- **Batch image loading** — load all images from a directory or select specific files
+- **EXIF orientation correction** — automatic image rotation based on embedded metadata
+- **Real-time tracking** — displays current round and match number
+- **Multi-format support** — JPEG, PNG, GIF, and BMP
+- **Automatic scaling** — intelligently resizes images for display
 
-Приложение позволяет загрузить коллекцию фотографий и провести интерактивный турнир, где в каждом раунде вы выбираете понравившееся фото из двух (или трёх, если нечетное количество) вариантов. Проигравшие фото выбывают из турнира, и процесс повторяется до выявления одного победителя.
+## Supported Platforms
 
-### Возможности
-- ✅ Загрузка фото из папки или выбор конкретных файлов
-- ✅ Автоматическая рандомизация участников перед каждым раундом
-- ✅ Система плей-офф на выбывание
-- ✅ Поддержка нечетного количества фото (3 участника в первом матче)
-- ✅ Автоматическое исправление ориентации фото по EXIF метаданным
-- ✅ Красивый интерфейс с показом текущего раунда и матча
-- ✅ Объявление победителя в конце
+Cross-platform compatibility verified on:
 
-### Поддерживаемые форматы
-- JPG / JPEG
-- PNG
-- GIF
-- BMP
+- Windows 10, Windows 11
+- Windows Subsystem for Linux 2 (WSL2)
+- macOS 10.14+
+- Linux (Ubuntu 20.04+)
 
-## 📋 Требования
+Requires Python 3.8 or higher.
 
-- **Python** 3.8 или выше
-- **pip** (идет в комплекте с Python)
+## Requirements
 
-## 🚀 Установка
+- **Python** 3.8+
+- **PyQt6** 6.7.0
+- **Pillow** 9.0+
 
-### 1. Клонируй репозиторий
+## Installation
 
-```bash
-git clone https://github.com/yourusername/photo-tournament.git
-cd photo-tournament
-```
+### From source
 
-### 2. Установи зависимости
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/photo-tournament.git
+   cd photo-tournament
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Или на Windows/WSL2 (если возникают проблемы с Pillow):
+3. Run the application:
+   ```bash
+   python tournament_app.py
+   ```
 
-```bash
-pip install --only-binary :all: Pillow PyQt6
-```
+### Precompiled executable
 
-## ▶️ Запуск
+Download `tournament_app.exe` for Windows and execute directly. No dependencies required.
 
-```bash
-python tournament_app.py
-```
+## Usage
 
-Приложение откроется в отдельном окне.
+### Start tournament
+1. Launch the application
+2. Click **"Load Images from Folder"** to load all images from a directory, or **"Select Images"** to choose specific files
+3. Click **"Start Tournament"**
 
-## 📖 Как использовать
+### During tournament
+1. Two (or three, in the first match of odd-numbered rounds) images are displayed
+2. Click on the image you prefer
+3. Selected image advances to the next round
+4. Repeat until a single winner remains
 
-1. **Экран загрузки**
-   - Нажми **"Загрузить фото из папки"** для загрузки всех фото из выбранной папки
-   - Или нажми **"Выбрать фото"** для выбора конкретных файлов
-   - Счетчик покажет количество загруженных фото
+### Tournament mechanics
+- All participants are randomized before the first round
+- Each round eliminates losing images
+- First match of odd-numbered rounds contains 3 participants; subsequent matches contain 2
+- Process continues until one image remains
 
-2. **Запуск турнира**
-   - Убедись, что загружено минимум 2 фото
-   - Нажми **"Начать турнир"**
-
-3. **Голосование**
-   - На экране турнира видишь 2-3 фото
-   - Нажми на фото, которое тебе больше нравится
-   - Выбранное фото переходит в следующий раунд
-
-4. **Раунды**
-   - После каждого раунда автоматически формируется список победителей
-   - Процесс повторяется до выявления одного победителя
-   - Если на раунде нечетное количество фото, первый матч будет с 3 участниками
-
-5. **Результаты**
-   - Победитель турнира отображается на отдельном экране
-   - Нажми **"Новый турнир"** для запуска еще одного
-
-## 🛠️ Стек технологий
-
-- **GUI:** PyQt6 — современный фреймворк для создания desktop приложений
-- **Обработка изображений:** Pillow — работа с форматами и EXIF метаданными
-
-## 📁 Структура проекта
+## File Structure
 
 ```
 photo-tournament/
-├── tournament_app.py      # Главное приложение
-├── requirements.txt       # Зависимости
-└── README.md             # Этот файл
+├── tournament_app.py      — Main application
+├── requirements.txt       — Python dependencies
+└── README.md             — Documentation
 ```
 
-## 💡 Примеры использования
+## Technical Details
 
-### Турнир с друзьями
-Загрузи фото с совместной поездки и узнайте, какое самое удачное!
+**GUI Framework:** PyQt6 — cross-platform desktop application framework
 
-### Выбор логотипа
-Помощь в выборе дизайна логотипа между вариантами.
+**Image Processing:** Pillow — handles image loading, scaling, and EXIF metadata extraction and application
 
-### Рейтинг игр/фильмов
-Создай ранжирование между играми или фильмами через голосование.
+**Architecture:** Single-window application using QStackedWidget for scene management (menu, tournament, results)
 
-## ⚠️ Дисклеймер
+## Known Limitations
 
-**This project is a proof-of-concept and is provided "as is" without warranty of any kind. It's a hobby project created for fun and educational purposes. Use at your own risk. The author assumes no responsibility for any issues, bugs, or problems that may arise from using this software.**
+- Loading 1000+ images may require several seconds depending on average image size
+- Images larger than 10000×10000 pixels are automatically scaled for display
+- First match of odd-numbered rounds contains 3 participants instead of 2
 
-**Это проект-прототип, предоставляется "как есть" без каких-либо гарантий. Это хобби-проект, созданный для развлечения и образовательных целей. Используйте на свой риск. Автор не несет ответственность за любые проблемы, ошибки или проблемы, которые могут возникнуть при использовании этого программного обеспечения.**
+## Building Executable
+
+Using PyInstaller:
+
+```bash
+pip install pyinstaller
+pyinstaller --onefile --windowed tournament_app.py
+```
+
+Compiled executable will be in `dist/tournament_app.exe`.
+
+## License
+
+MIT License
 
 ---
 
-**Made with ❤️ as a side project**
+*Proof-of-concept project provided as-is without warranty.*
