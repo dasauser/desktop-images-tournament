@@ -108,8 +108,8 @@ Compiled executable will be in `dist/tournament_app.exe`.
 
 ## License
 
-MIT License
+[MIT](LICENSE)
 
 ---
 
-*Proof-of-concept project provided as-is without warranty.*
+*This project was developed with assistance from [Claude](https://claude.ai) (Anthropic).*
